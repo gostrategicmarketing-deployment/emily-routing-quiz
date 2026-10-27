@@ -1,0 +1,70 @@
+/* Additions for the routing funnel. Tokens come from tmc.css (verified brand: navy #24408E, red #ED1C24, teal #00BDA5, Cabin). */
+
+.qz-legal { font-size: var(--fs-xs); color: var(--muted); text-align: center; padding: 0 20px 28px; max-width: 640px; margin: 0 auto; }
+.qz-legal a { color: var(--navy); }
+
+/* Hook-band hero with Emily on the right (the same device as her ads). */
+.hb-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(16px, 3vw, 40px); align-items: end; }
+.hb-copy { display: flex; flex-direction: column; gap: 18px; padding-block: clamp(30px, 5vw, 64px); }
+.hb-copy .btn-sub { color: #AFC0E2; }
+.hb-pic { align-self: end; display: flex; justify-content: center; }
+.hb-pic img { width: min(100%, 440px); height: auto; display: block; }
+.hookband .hb-copy h1 { font-size: clamp(2rem, 1.2rem + 3.6vw, 3.5rem); }
+@media (max-width: 760px) { .hb-grid { grid-template-columns: minmax(0, 1fr); } .hb-pic { order: 2; max-height: 300px; overflow: hidden; } .hb-pic img { width: min(80%, 320px); } }
+
+.pair { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 860px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+.pair .card { display: flex; flex-direction: column; gap: 10px; }
+.pair .num { width: 38px; height: 38px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; font-family: var(--display); }
+.pair h3 { color: var(--navy); font-size: var(--fs-lg); }
+
+/* The situations grid on the landing page. */
+.sits { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 960px) { .sits { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .sits { grid-template-columns: minmax(0, 1fr); } }
+.sit { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px; display: flex; flex-direction: column; gap: 6px; }
+.sit b { color: var(--navy); font-family: var(--display); font-size: var(--fs-md); }
+.sit span { color: var(--muted); font-size: var(--fs-sm); line-height: 1.5; }
+
+/* Result pages */
+.profile-card { background: var(--paper); border-radius: 22px; border: 1px solid var(--line); box-shadow: var(--shadow-2); overflow: hidden; }
+.profile-card .ph { background: var(--band); color: #fff; padding: clamp(20px, 4vw, 34px); display: flex; flex-direction: column; gap: 8px; }
+.profile-card .ph .kicker { font-size: var(--fs-xs); letter-spacing: .14em; text-transform: uppercase; color: #9FB6E8; font-weight: 700; }
+.profile-card .ph h2 { color: #fff; font-size: var(--fs-2xl); line-height: 1.05; }
+.profile-card .ph p { color: #C9D3E6; font-size: var(--fs-md); }
+.profile-card .pb { padding: clamp(20px, 4vw, 34px); display: flex; flex-direction: column; gap: 20px; }
+.profile-card .pb p.big { font-size: var(--fs-lg); }
+.profile-card h3 { color: var(--navy); font-size: var(--fs-md); text-transform: uppercase; letter-spacing: .08em; }
+
+.callout { background: #FFF4D6; border: 1px solid #F0D68A; border-radius: var(--r-sm); padding: 14px 18px; color: #4A3500; }
+.callout b { color: #4A3500; }
+.callout.teal { background: #E3F8F4; border-color: #A8E6DB; color: var(--ink); }
+.callout.teal b { color: var(--ink); }
+
+.next { background: var(--paper); border: 2px solid var(--navy); border-radius: 22px; box-shadow: var(--shadow-2); overflow: hidden; }
+.next .nh { background: var(--navy); color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.next .nh b { font-family: var(--display); font-size: var(--fs-lg); }
+.next .nh span { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .12em; color: #BFD0F2; font-weight: 700; }
+.next .nb { padding: clamp(20px, 3vw, 30px); display: flex; flex-direction: column; gap: 18px; }
+.next .price-row { margin-top: 0; }
+.next .alt { text-align: center; font-size: var(--fs-sm); color: var(--muted); }
+.next .alt a { color: var(--navy); font-weight: 700; }
+
+.res-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: clamp(22px, 3.5vw, 40px); align-items: start; }
+.res-grid .side { position: sticky; top: calc(84px + env(safe-area-inset-top, 0px)); display: flex; flex-direction: column; gap: 18px; }
+@media (max-width: 900px) { .res-grid { grid-template-columns: minmax(0, 1fr); } .res-grid .side { position: static; } }
+.emily-note { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: start; background: var(--sky); border-radius: var(--r-lg); padding: 18px; }
+.emily-note img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; object-position: 50% 15%; background: var(--paper); }
+.emily-note b { color: var(--navy); }
+
+.workshop-strip { background: var(--sky); border-radius: var(--r-lg); padding: clamp(20px, 3vw, 30px); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: center; }
+@media (max-width: 700px) { .workshop-strip { grid-template-columns: minmax(0, 1fr); } }
+.workshop-strip h3 { color: var(--navy); }
+
+/* Blocks whose link isn't in the project files yet: hidden normally, flagged in ?preview=1. */
+.pending { position: relative; outline: 3px dashed #E0A800; outline-offset: 6px; }
+.pending::before { content: attr(data-pending-label); position: absolute; top: -14px; left: 14px; background: #FFF4D6; color: #6B4A00; font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; z-index: 5; }
+.pending a.btn { pointer-events: none; opacity: .6; }
+[hidden] { display: none !important; }
+
+.fine { font-size: var(--fs-xs); color: var(--muted); line-height: 1.6; }

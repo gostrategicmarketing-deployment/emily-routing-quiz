@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Medicare Starting-Point Check | Questions</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400;0,600;0,700;1,500&display=swap">
+<link rel="stylesheet" href="assets/tmc.css">
+<link rel="stylesheet" href="assets/routes.css">
+<style>html, body { height: 100%; }</style>
+</head>
+<body>
+<div class="qz-shell">
+  <div class="qz-top">
+    <div class="wrap">
+      <a href="index.html"><img class="logo" src="assets/img/logo.png" alt="The Medicare Coach" width="170" height="19"></a>
+      <span class="count" id="count">Question 1</span>
+    </div>
+    <div class="qz-bar" aria-hidden="true"><i id="bar"></i></div>
+  </div>
+  <main class="qz-main">
+    <div class="wrap" style="width:100%;display:flex;justify-content:center">
+      <div class="qz-card" id="stage" aria-live="polite"><noscript><h2>This check needs JavaScript turned on.</h2><p>Prefer to talk it through? Call our team at 785-537-6225.</p></noscript></div>
+    </div>
+  </main>
+  <p class="qz-legal">The Medicare Coach is not an insurance agency, doesn't sell insurance and isn't connected with or endorsed by the U.S. government or the Medicare program. <a href="https://www.themedicarecoach.com/privacy-policy/">Privacy Policy</a> · <a href="https://www.themedicarecoach.com/terms-and-conditions/">Terms</a></p>
+</div>
+
+<script src="assets/routing.js"></script>
+<script src="assets/tmc.js"></script>
+<script>
+/* Medicare Starting-Point Check. 3 core questions (the same three the live GHL scoring uses), then the
+   questions that decide where each person goes. Questions that don't apply are skipped. */
+(function () {
+  var Qz = window.TMCQuiz, T = window.TMC;
+  var NONE = function (A) { return A.ins !== "medicare" && A.ins !== "medicaid"; };
+  var AGE = function (A) { return Qz.ageFromDob(A.dob); };
+
+  var Q = [
+    { id: "ins", q: "What's your current health insurance?", o: [
+      ["employer", "Employer plan (mine or my spouse's)"], ["retiree", "Retiree insurance"], ["marketplace", "Marketplace or private plan"],
+      ["medicare", "Medicare"], ["va", "VA benefits (includes VA, Tricare and CHAMPVA)"], ["medicaid", "Medicaid"], ["other", "Other"] ] },
+    { id: "dob", type: "dob", q: "What's your date of birth?", hint: "We use this to work out your Medicare dates. It stays private." },
+    { id: "ss", q: "Are you currently drawing Social Security?", o: [["yes", "Yes"], ["no", "No"]] },
+    { id: "fit", q: "Do you know whether your employer plan meets Medicare's rules and costs?", hint: "Most people aren't sure, and that's a perfectly good answer.",
+      show: function (A) { return A.ins === "employer"; },
+      o: [["meets", "Yes, I've confirmed it works with Medicare"], ["unsure", "I'm not sure"], ["no", "I haven't looked into it yet"]] },
+    { id: "timing", q: "When do you expect to start Medicare?",
+      show: function (A) { return NONE(A) && (A.ins === "employer" || (AGE(A) !== null && AGE(A) < 65)); },
+      o: [["w12", "In the next 12 months"], ["later", "More than 12 months from now"], ["unsure", "I'm not sure yet"]] },
+    { id: "savings", q: "Roughly how much have you saved for retirement?", hint: "It helps us point out what matters most for you, because medical bills come out of the same savings. It stays private.",
+      show: NONE,
+      o: [["u100", "Under $100,000"], ["s100", "$100,000 to $500,000"], ["s500", "$500,000 to $1 million"], ["s1m", "Over $1 million"], ["na", "I'd rather not say"]] },
+    { id: "hsa", q: "Are you putting money into a Health Savings Account (HSA)?", hint: "There's a Medicare rule about HSAs that catches a lot of people.",
+      show: function (A) { return A.ins === "employer" || A.ins === "marketplace"; },
+      o: [["yes", "Yes"], ["no", "No"]] },
+    { id: "priority", q: "What matters most to you when it comes to health insurance and care?", show: NONE, o: [
+      ["doctors", "I want to be able to see my preferred doctors"], ["catastrophic", "I want to protect myself from catastrophic medical costs"],
+      ["premium", "I want the lowest monthly premium"], ["perks", "I want a plan with extra perks (dental, vision, gym, payback)"],
+      ["travel", "I want good coverage when I'm traveling or living in multiple states"] ] },
+    { gate: true }
+  ];
+
+  var A = {}, i = 0, history = [];
+  var stage = document.getElementById("stage"), bar = document.getElementById("bar"), count = document.getElementById("count");
+
+  function visible() { return Q.filter(function (x) { return x.gate || !x.show || x.show(A); }); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function cur() { var v = visible(); return v[Math.min(i, v.length - 1)]; }
+  function progress() {
+    var v = visible(), s = cur(), n = v.length - 1; // questions only
+    bar.style.width = Math.round((s.gate ? 1 : Math.min(i, n) / (n + 1)) * 100) + "%";
+    count.textContent = s.gate ? "Almost done" : "Question " + (i + 1);
+  }
+  function backBtn() { return history.length ? '<button class="qz-back" type="button" id="back">← Back</button>' : ""; }
+  function next() { history.push(i); i++; render(); }
+
+  function render() {
+    stage.removeAttribute("data-busy");
+    progress();
+    var s = cur(), html = "";
+    if (s.gate) {
+      html = '<div class="qz-anim stack" style="gap:20px"><span class="qn">Your starting point is ready</span>' +
+        '<h2>Where should we send it?</h2>' +
+        '<p class="muted">You\'ll see your result on the next screen. We\'re not insurance agents and we don\'t sell plans.</p>' +
+        '<form id="gate" novalidate class="stack" style="gap:14px">' +
+        '<div class="field"><label for="fn">First name</label><input id="fn" name="first_name" autocomplete="given-name" required value="' + esc(A.first_name || "") + '"></div>' +
+        '<div class="field"><label for="em">Email</label><input id="em" name="email" type="email" autocomplete="email" required value="' + esc(A.email || "") + '"><span class="err" id="err" hidden>Enter your email so we can send your result.</span></div>' +
+        '<div class="field"><label for="ph">Phone <span class="muted" style="font-weight:400">(optional)</span></label><input id="ph" name="phone" type="tel" autocomplete="tel" value="' + esc(A.phone || "") + '"></div>' +
+        '<button class="btn btn-red" type="submit">Show My Starting Point <span class="arrow" aria-hidden="true">→</span></button>' +
+        '<p class="disclaim">By continuing you agree that The Medicare Coach may email you about your result and, if you enter a phone number, call or text you about Medicare help. Consent is not a condition of purchase. Unsubscribe or opt out anytime.</p></form>' +
+        backBtn() + '</div>';
+    } else if (s.type === "dob") {
+      html = '<div class="qz-anim stack" style="gap:20px"><span class="qn">Question ' + (i + 1) + '</span><h2>' + esc(s.q) + '</h2><p class="hint">' + esc(s.hint) + '</p>' +
+        '<form id="dobf" novalidate class="stack" style="gap:14px"><div class="field"><label for="dob">Date of birth</label>' +
+        '<input id="dob" inputmode="numeric" autocomplete="bday" placeholder="MM/DD/YYYY" maxlength="10" value="' + esc(A.dob || "") + '"><span class="err" id="derr" hidden>Enter your birthday as MM/DD/YYYY.</span></div>' +
+        '<button class="btn btn-navy" type="submit" style="align-self:flex-start">Continue <span class="arrow" aria-hidden="true">→</span></button></form>' + backBtn() + '</div>';
+    } else {
+      html = '<div class="qz-anim stack" style="gap:20px"><span class="qn">Question ' + (i + 1) + '</span><h2>' + esc(s.q) + '</h2>' + (s.hint ? '<p class="hint">' + esc(s.hint) + '</p>' : "") +
+        '<div class="opts" role="radiogroup">' + s.o.map(function (o) {
+          return '<button type="button" class="opt' + (A[s.id] === o[0] ? " sel" : "") + '" data-v="' + o[0] + '" role="radio" aria-checked="' + (A[s.id] === o[0]) + '"><span class="dot" aria-hidden="true"></span>' + esc(o[1]) + '</button>';
+        }).join("") + "</div>" + backBtn() + "</div>";
+    }
+    stage.innerHTML = html;
+    var b = document.getElementById("back");
+    if (b) b.onclick = function () { i = history.pop() || 0; render(); };
+
+    stage.querySelectorAll(".opt").forEach(function (btn) {
+      btn.onclick = function () {
+        if (stage.getAttribute("data-busy")) return;
+        stage.setAttribute("data-busy", "1");
+        stage.querySelectorAll(".opt").forEach(function (x) { x.classList.remove("sel"); x.setAttribute("aria-checked", "false"); });
+        btn.classList.add("sel"); btn.setAttribute("aria-checked", "true");
+        A[s.id] = btn.getAttribute("data-v");
+        setTimeout(next, 240);
+      };
+    });
+
+    var df = document.getElementById("dobf");
+    if (df) {
+      var inp = document.getElementById("dob"); inp.focus();
+      inp.oninput = function () {
+        var d = inp.value.replace(/\D/g, "").slice(0, 8), o = d.slice(0, 2);
+        if (d.length > 2) o += "/" + d.slice(2, 4); if (d.length > 4) o += "/" + d.slice(4);
+        inp.value = o; document.getElementById("derr").hidden = true;
+      };
+      df.onsubmit = function (e) {
+        e.preventDefault();
+        if (Qz.ageFromDob(inp.value) === null) { document.getElementById("derr").hidden = false; inp.focus(); return; }
+        A.dob = inp.value; next();
+      };
+    }
+
+    var form = document.getElementById("gate");
+    if (form) {
+      document.getElementById("fn").focus();
+      form.onsubmit = function (e) {
+        e.preventDefault();
+        var em = document.getElementById("em").value.trim();
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { document.getElementById("err").hidden = false; document.getElementById("em").focus(); return; }
+        A.first_name = document.getElementById("fn").value.trim();
+        A.email = em; A.phone = document.getElementById("ph").value.trim();
+        finish();
+      };
+    }
+  }
+
+  function finish() {
+    var R = Qz.compute(A);
+    Qz.save(A, R);
+    bar.style.width = "100%"; count.textContent = "Building your result";
+    stage.innerHTML = '<div class="loader qz-anim"><div class="ring" aria-hidden="true"></div><h2>Finding your starting point…</h2><ul id="ls">' +
+      ["Checking your Medicare dates", "Matching your coverage", "Choosing your next step"].map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul></div>";
+    var lis = stage.querySelectorAll("#ls li"), k = 0, shown = false, posted = false;
+    function leave() { if (shown && posted) location.href = Qz.ROUTES[R.route] + location.search; }
+    (function tick() { if (k < lis.length) { lis[k].classList.add("done"); k++; setTimeout(tick, 600); } else { shown = true; leave(); } })();
+    Qz.submit(A, R, function () { posted = true; leave(); });
+  }
+  render();
+})();
+</script>
+</body>
+</html>
